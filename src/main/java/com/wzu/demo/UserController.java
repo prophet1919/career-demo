@@ -14,7 +14,7 @@ public class UserController {
             Map.of("id",2,"name","李四","age",21)
     ));
     @GetMapping("/users")
-    public List<Map<String,Object>> users(
+    public Result<List<Map<String,Object>>> users(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size){
         //校验
@@ -24,18 +24,18 @@ public class UserController {
 
         int from = (page - 1) * size;
         if(from > userList.size()){
-            return List.of();
+            return Result.ok(List.of());
         }
         int to = Math.min(from + size, userList.size());
-        return userList.subList(from, to);
+        return Result.ok(userList.subList(from, to));
     }
     @GetMapping("/users/{id}")
-    public Map<String, Object> userById(@PathVariable int id){
+    public Result<Map<String, Object>> userById(@PathVariable int id){
         for(Map<String,Object> u:userList){
             if(u.get("id").equals(id)){
-                return u;
+                return Result.ok(u);
             }
         }
-        return Map.of("error","用户不存在");
+        return Result.ok(Map.of("error","用户不存在"));
     }
 }

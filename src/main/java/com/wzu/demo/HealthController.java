@@ -9,7 +9,7 @@ import java.util.Map;
 public class HealthController {
 
     @GetMapping("/health")
-    public Map<String, Object> health() {
-        return Map.of("status", "ok", "time", System.currentTimeMillis());
+    public Result<Map<String, Object>> health() {
+        return Result.ok(Map.of("status", "ok", "time", System.currentTimeMillis()));
     }
 }
