@@ -1,13 +1,19 @@
 package com.wzu.demo;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
 @RestController
+@Validated
 public class UserController {
     private final List<Map<String,Object>> userList = new ArrayList<>(List.of(
             Map.of("id",1,"name","张三","age",20),
@@ -15,12 +21,8 @@ public class UserController {
     ));
     @GetMapping("/users")
     public Result<List<Map<String,Object>>> users(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size){
-        //校验
-        if(page < 1) page = 1;
-        if(size < 1) size = 10;
-        if(size > 100 ) size = 100;
+            @RequestParam(defaultValue = "1") @Min(1) int page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size){
 
         int from = (page - 1) * size;
         if(from > userList.size()){
@@ -36,6 +38,6 @@ public class UserController {
                 return Result.ok(u);
             }
         }
-        return Result.ok(Map.of("error","用户不存在"));
+        throw new BizException(404, "用户不存在");
     }
 }
