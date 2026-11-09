@@ -1,43 +1,35 @@
 package com.wzu.demo;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
 
 @RestController
 @Validated
 public class UserController {
-    private final List<Map<String,Object>> userList = new ArrayList<>(List.of(
-            Map.of("id",1,"name","张三","age",20),
-            Map.of("id",2,"name","李四","age",21)
-    ));
+
+    private final UserService userService;
+
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
+
     @GetMapping("/users")
-    public Result<List<Map<String,Object>>> users(
+    public Result<List<User>> users(
             @RequestParam(defaultValue = "1") @Min(1) int page,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size){
-
-        int from = (page - 1) * size;
-        if(from > userList.size()){
-            return Result.ok(List.of());
-        }
-        int to = Math.min(from + size, userList.size());
-        return Result.ok(userList.subList(from, to));
+        return Result.ok(userService.page(page, size));
     }
+
     @GetMapping("/users/{id}")
-    public Result<Map<String, Object>> userById(@PathVariable int id){
-        for(Map<String,Object> u:userList){
-            if(u.get("id").equals(id)){
-                return Result.ok(u);
-            }
+    public Result<User> userById(@PathVariable Long id){
+        User u = userService.findById(id);
+        if(u == null){
+            throw new BizException(404, "用户不存在");
         }
-        throw new BizException(404, "用户不存在");
+        return Result.ok(u);
     }
 }
