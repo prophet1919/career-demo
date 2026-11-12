@@ -12,10 +12,11 @@ public class UserService {
     private final Map<Long, User> store = new ConcurrentHashMap<>();
     private final AtomicLong idGen = new AtomicLong();
 
-    public UserService() {
+    public UserService(PasswordService passwordService) {
         //预置两个用户
-        save(new User(null, "张三", "123456", "USER"));
-        save(new User(null, "李四", "123456", "USER"));
+        String p = passwordService.encode("123456");
+        save(new User(null, "张三", p, "USER"));
+        save(new User(null, "李四", p, "USER"));
     }
 
     public User save(User u){
