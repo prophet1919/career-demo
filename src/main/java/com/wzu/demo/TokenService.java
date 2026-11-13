@@ -1,8 +1,10 @@
 package com.wzu.demo;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
+
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -26,5 +28,13 @@ public class TokenService {
                 .expiration(new Date(now + EXPIRE_MS))
                 .signWith(key)
                 .compact();
+    }
+    /** 校验并解析 token。签名不对 / 过期 / 格式错 都会抛异常，交给调用方处理 */
+    public Claims parse(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
