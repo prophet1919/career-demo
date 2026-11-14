@@ -17,6 +17,7 @@ public class UserService {
         String p = passwordService.encode("123456");
         save(new User(null, "张三", p, "USER"));
         save(new User(null, "李四", p, "USER"));
+        save(new User(null, "admin", p, "ADMIN"));
     }
 
     public User save(User u){
